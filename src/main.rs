@@ -1,6 +1,7 @@
 use std::env;
 use std::fs;
 use std::path::Path;
+use std::char;
 
 //The following crates are used for testing
 extern crate tempfile; //Creates temp files and directories
@@ -17,20 +18,25 @@ fn main() {
 
     //TODO: Panic if not enough arguments are provided
     //Panic should output the string "Not enough arguments"
+    //and exit with a status code of 1
+    if args.len() < 3 {
+        panic!("Not enough arguments");
+    } 
 
     //TODO:
     //  * Pass an argument to read_file to read the original text
     //  * Pass that to disemvowel to remove the vowels
     //  * Write the disemvoweled text using write_file
+    let path = Path::new(&args[1]);
 
     // Replace String::from("dummy text") with what you get from read_file
-    let s = String::from("dummy text");
+    let s = read_file(&path);
 
     let s_disemvowel = disemvowel(&s);
 
     // Use command-line arguments for the name of the file,
     // and s_disemvowel for the text to write out.
-    write_file(Path::new("dummy.txt"), "output string");
+    write_file(Path::new(&args[2]), &s_disemvowel);
 }
 
 fn read_file(path: &Path) -> String {
@@ -42,7 +48,26 @@ fn write_file(path: &Path, s: &str) {
 
 //TODO: Return the input string without vowels.
 fn disemvowel(s: &str) -> String {
-    String::from(s)
+    let mut s_disemvowel = String::new();
+    for c in s.chars() {
+        if c.is_alphabetic() {
+            if !match_vowels(c) {
+                s_disemvowel.push(c);
+            }
+        } else {
+            s_disemvowel.push(c);
+        }
+    }
+    s_disemvowel
+}
+
+//Function to match a given character to a vowel
+fn match_vowels(c: char) -> bool {
+    let c_lower = c.to_lowercase().next().unwrap();
+    match c_lower {
+        'a' | 'e' | 'i' | 'o' | 'u' => true,
+        _ => false,
+    }
 }
 
 // Everything from here down is Rust test code. You shouldn't need to
